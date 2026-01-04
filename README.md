@@ -19,7 +19,7 @@ rm -rf ~/.emacs.d \
 # 2
 
 ```bash
-git clone https://github.com/LionyxML/emacs-kick.git ~/.emacs.d
+git clone https://github.com/Geordanny1/emacs-kick.git ~/.emacs.d
 ```
 
 # 3 
