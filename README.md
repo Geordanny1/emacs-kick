@@ -51,30 +51,6 @@ enjoying it, you can:
 
 With `Emacs-Kick`, the goal is to empower you to explore Emacs at your
 own pace. The sky's the limit! 🌟
-
-## Minimum Requirements
-
-- Emacs version **>=30.1**
-- You can verify your installed Emacs version by running:
-
-```bash
-emacs --version
-```
-
-**Note**: floating windows on TUI are only supported from Emacs >=31 (current
-development version on Emacs master branch).
-
-
-### macOS Warning
-
-On macOS, `Emacs-Kick` may fail to function correctly due to missing or
-incompatible system utilities. To avoid common issues, make sure the
-following tools are installed via Homebrew:
-
-```bash
-brew install coreutils git
-```
-
 This provides:
 
 - `gls`: The GNU version of `ls`, required by Dired to avoid errors
@@ -93,41 +69,31 @@ This provides:
 
 ## Installation Instructions
 
-1. **Clone the repository**:
-
-**Note**: If you already have an existing Emacs configuration in
-`~/.emacs.d`, please back it up before proceeding. You can do this
-by renaming the directory:
+# 1
 
 ```bash
-mv ~/.emacs.d ~/.emacs.d.backup
+rm -rf ~/.emacs.d \
+       ~/.emacs \
+       ~/.emacs~ \
+       ~/.config/emacs \
+       ~/.config/doom \
+       ~/.doom.d \
+       ~/.cache/emacs \
+       ~/.cache/doom \
+       ~/.local/share/emacs \
+       ~/.local/state/emacs
 ```
 
-If you have any additional configurations from other Emacs
-installations, please clean them up. This includes directories and
-files such as `~/.emacs.d`, `~/.emacs`, `~/.emacs~`,
-`~/.config/emacs`, `~/.config/doom`, `~/.config/cache/emacs` and
-any other related files.
-
-After deleting/backing up, clone the repository:
+# 2
 
 ```bash
 git clone https://github.com/LionyxML/emacs-kick.git ~/.emacs.d
 ```
 
-2. **Run the setup**:
-
-After cloning, install the configuration by running:
+# 3 
 
 ```bash
 emacs -nw --eval="(ek/first-install)"
-```
-
-Alternatively, you can run the provided script `ek-reinstall.sh`
-from inside `~/.emacs.d/`, which will achieve the same result:
-
-```bash
-cd ~/.emacs.d/ && ./ek-reinstall.sh
 ```
 
 Both methods will install all necessary packages and apply the
