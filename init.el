@@ -497,19 +497,6 @@
   :defer t)       ;; Defer loading Org-mode until it's needed.
 
 
-;;; WHICH-KEY
-;; `which-key' is an Emacs package that displays available keybindings in a
-;; popup window whenever you partially type a key sequence. This is particularly
-;; useful for discovering commands and shortcuts, making it easier to learn
-;; Emacs and improve your workflow. It helps users remember key combinations
-;; and reduces the cognitive load of memorizing every command.
-(use-package which-key
-  :ensure nil     ;; This is built-in, no need to fetch it.
-  :defer t        ;; Defer loading Which-Key until after init.
-  :hook
-  (after-init . which-key-mode)) ;; Enable which-key mode after initialization.
-
-
 ;;; ==================== EXTERNAL PACKAGES ====================
 ;;
 ;; From this point onward, all configurations will be for third-party packages
@@ -662,7 +649,7 @@
   :straight t
   :defer t
   :custom
-  (corfu-auto nil)                        ;; Only completes when hitting TAB
+  (corfu-auto t)                        ;; Only completes when hitting TAB
   ;; (corfu-auto-delay 0)                ;; Delay before popup (enable if corfu-auto is t)
   (corfu-auto-prefix 1)                  ;; Trigger completion after typing 1 character
   (corfu-quit-no-match t)                ;; Quit popup if no match
@@ -702,23 +689,23 @@
 ;;       (e.g., asdf or nvm) or other issues.
 ;;       Fortunately, `lsp-mode` has a great resource site:
 ;;       https://emacs-lsp.github.io/lsp-mode/
+
 (use-package lsp-mode
   :ensure t
   :straight t
   :defer t
-  :hook (;; Replace XXX-mode with concrete major mode (e.g. python-mode)
-         (lsp-mode . lsp-enable-which-key-integration)  ;; Integrate with Which Key
-         ((js-mode                                      ;; Enable LSP for JavaScript
-           tsx-ts-mode                                  ;; Enable LSP for TSX
-           typescript-ts-base-mode                      ;; Enable LSP for TypeScript
-           css-mode                                     ;; Enable LSP for CSS
-           go-ts-mode                                   ;; Enable LSP for Go
-           js-ts-mode                                   ;; Enable LSP for JavaScript (TS mode)
-           prisma-mode                                  ;; Enable LSP for Prisma
-           python-base-mode                             ;; Enable LSP for Python
-           ruby-base-mode                               ;; Enable LSP for Ruby
-           rust-ts-mode                                 ;; Enable LSP for Rust
-           web-mode) . lsp-deferred))                   ;; Enable LSP for Web (HTML)
+  :hook ((lsp-mode . lsp-enable-which-key-integration)  ;; Integrate with Which Key
+         (js-mode . lsp-deferred)                       ;; Enable LSP for JavaScript
+         (tsx-ts-mode . lsp-deferred)                   ;; Enable LSP for TSX
+         (typescript-ts-base-mode . lsp-deferred)       ;; Enable LSP for TypeScript
+         (css-mode . lsp-deferred)                      ;; Enable LSP for CSS
+         (go-ts-mode . lsp-deferred)                    ;; Enable LSP for Go
+         (js-ts-mode . lsp-deferred)                    ;; Enable LSP for JavaScript (TS mode)
+         (prisma-mode . lsp-deferred)                   ;; Enable LSP for Prisma
+         (python-mode . lsp-deferred)                   ;; Enable LSP for Prisma
+         (python-base-mode . lsp-deferred)              ;; Enable LSP for Python
+         (ruby-base-mode . lsp-deferred)                ;; Enable LSP for Ruby
+         (rust-ts-mode . lsp-deferred))                 ;; Enable LSP for Rust
   :commands lsp
   :custom
   (lsp-keymap-prefix "C-c l")                           ;; Set the prefix for LSP commands.
@@ -726,8 +713,9 @@
   (lsp-completion-provider :none)                       ;; Disable the default completion provider.
   (lsp-session-file (locate-user-emacs-file ".lsp-session")) ;; Specify session file location.
   (lsp-log-io nil)                                      ;; Disable IO logging for speed.
-  (lsp-idle-delay 0.5)                                  ;; Set the delay for LSP to 0 (debouncing).
+  (lsp-idle-delay 0.5)                                  ;; Set the delay for LSP to 0.5 (debouncing).
   (lsp-keep-workspace-alive nil)                        ;; Disable keeping the workspace alive.
+  (lsp-auto-guess-root t)                               ;; Auto-guess project root - NO MORE PROMPTS!
   ;; Core settings
   (lsp-enable-xref t)                                   ;; Enable cross-references.
   (lsp-auto-configure t)                                ;; Automatically configure LSP.
@@ -757,11 +745,10 @@
   ;; Headerline settings
   (lsp-headerline-breadcrumb-enable-symbol-numbers t)   ;; Enable symbol numbers in the headerline.
   (lsp-headerline-arrow "▶")                            ;; Set arrow for headerline.
-  (lsp-headerline-breadcrumb-enable-diagnostics nil)    ;; Disable diagnostics in headerline.
+ (lsp-headerline-breadcrumb-enable-diagnostics nil)    ;; Disable diagnostics in headerline.
   (lsp-headerline-breadcrumb-icons-enable nil)          ;; Disable icons in breadcrumb.
   ;; Semantic settings
   (lsp-semantic-tokens-enable nil))                     ;; Disable semantic tokens.
-
 
 ;;; LSP Additional Servers
 ;; You can extend `lsp-mode' by integrating additional language servers for specific
@@ -1261,30 +1248,29 @@
   (nerd-icons-completion-mode)            ;; Activate nerd icons for completion interfaces.
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)) ;; Setup icons in the marginalia mode for enhanced completion display.
 
+;;; DOOM THEMES (INCLUDES MOLOKAI)
+;; The `doom-themes' package provides a collection of visually pleasing color themes
+;; for Emacs. We'll use the doom-molokai theme which is inspired by the classic
+;; molokai color scheme with modern improvements.
 
-;;; CATPPUCCIN THEME
-;; The `catppuccin-theme' package provides a visually pleasing color theme
-;; for Emacs that is inspired by the popular Catppuccin color palette.
-;; This theme aims to create a comfortable and aesthetic coding environment
-;; with soft colors that are easy on the eyes.
-(use-package catppuccin-theme
+(use-package doom-themes
   :ensure t
   :straight t
+  :custom
+  ;; Global settings
+  (doom-themes-enable-bold t)     ; Enable bold fonts
+  (doom-themes-enable-italic t)   ; Enable italic fonts
+  ;; Treemacs theme integration (if you use treemacs)
+  (doom-themes-treemacs-theme "doom-molokai")
   :config
-  (custom-set-faces
-   ;; Set the color for changes in the diff highlighting to blue.
-   `(diff-hl-change ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
-
-  (custom-set-faces
-   ;; Set the color for deletions in the diff highlighting to red.
-   `(diff-hl-delete ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
-
-  (custom-set-faces
-   ;; Set the color for insertions in the diff highlighting to green.
-   `(diff-hl-insert ((t (:background unspecified :foreground ,(catppuccin-get-color 'green))))))
-
-  ;; Load the Catppuccin theme without prompting for confirmation.
-  (load-theme 'catppuccin :no-confirm))
+  ;; Load the doom-molokai theme
+  (load-theme 'doom-molokai t)
+  
+  ;; Enable custom neotree colors (optional)
+  (doom-themes-neotree-config)
+  
+  ;; Enable custom org-mode colors (optional)
+  (doom-themes-org-config))
 
 
 ;;; UTILITARY FUNCTION TO INSTALL EMACS-KICK
@@ -1303,6 +1289,94 @@
   (message ">>> Emacs-Kick installed! Press any key to close the installer and open Emacs normally. First boot will compile some extra stuff :)")
   (read-key)                                         ;; Wait for the user to press any key.
   (kill-emacs))                                      ;; Close Emacs after installation is complete.
+
+;;; WEB-MODE
+;; web-mode provides support for editing web templates and mixed HTML/CSS/JS files
+(use-package web-mode
+  :ensure t
+  :straight t
+  :defer t
+  :mode
+  (("\\.phtml\\'" . web-mode)
+   ("\\.php\\'" . web-mode)
+   ("\\.tpl\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode)
+   ("\\.mustache\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.html?\\'" . web-mode)))
+
+
+(use-package multiple-cursors
+  :ensure t
+  :straight t
+  :defer t
+  :bind (("C-M-j" . mc/mark-all-dwim)
+         ("C-M-c" . mc/edit-lines)
+         ("C-M-/" . mc/mark-all-like-this)
+         ("C-M-," . mc/mark-previous-like-this)
+         ("C-M-." . mc/mark-next-like-this)
+         ("C-M-<" . mc/skip-to-previous-like-this)
+         ("C-M->" . mc/skip-to-next-like-this))
+  :config)
+
+;;; EMMET-MODE
+;; Emmet (formerly Zen Coding) is a web-developer's toolkit that greatly improves
+;; HTML & CSS workflow. It allows you to write HTML and CSS using CSS-like selectors
+;; and expand them into full markup.
+
+(use-package emmet-mode
+  :ensure t
+  :straight t
+  :defer t
+  :hook
+  ;; Enable Emmet in web-related modes
+  ((web-mode . emmet-mode)
+   (html-mode . emmet-mode)
+   (css-mode . emmet-mode)
+   (sgml-mode . emmet-mode)
+   (nxml-mode . emmet-mode)
+   (js-mode . emmet-mode)          ;; For JSX/React
+   (js-ts-mode . emmet-mode)       ;; For JS Tree-sitter mode
+   (tsx-ts-mode . emmet-mode)      ;; For TSX Tree-sitter mode
+   (typescript-ts-base-mode . emmet-mode))  ;; For TypeScript
+  
+  :custom
+  ;; Customize Emmet behavior
+  (emmet-move-cursor-between-quotes t)      ;; Move cursor between quotes after expanding
+  (emmet-self-closing-tag-style " /")       ;; Self-closing tag style
+  (emmet-expand-jsx-className? t)           ;; Expand className in JSX
+  (emmet-preview-default nil)               ;; Disable preview by default (can enable if needed)
+  (emmet-indentation 2)                     ;; Indentation for expanded code
+  
+  :config
+  ;; Add keybindings for Emmet
+  (defun ek/setup-emmet-keys ()
+    "Set up Emmet keybindings."
+    (local-set-key (kbd "C-c e e") 'emmet-expand-line)     ;; Expand Emmet abbreviation
+    (local-set-key (kbd "C-c e w") 'emmet-wrap-with-markup) ;; Wrap selection with Emmet
+    (local-set-key (kbd "C-c e p") 'emmet-preview)          ;; Preview expansion
+    (local-set-key (kbd "C-c e s") 'emmet-next-edit-point)  ;; Next edit point
+    (local-set-key (kbd "C-c e a") 'emmet-prev-edit-point)) ;; Previous edit point
+  
+  ;; Apply keybindings to relevant modes
+  (add-hook 'web-mode-hook 'ek/setup-emmet-keys)
+  (add-hook 'html-mode-hook 'ek/setup-emmet-keys)
+  (add-hook 'css-mode-hook 'ek/setup-emmet-keys)
+  (add-hook 'js-mode-hook 'ek/setup-emmet-keys)
+  (add-hook 'js-ts-mode-hook 'ek/setup-emmet-keys)
+  (add-hook 'tsx-ts-mode-hook 'ek/setup-emmet-keys)
+  
+  ;; Special configuration for JSX/React
+  (defun ek/setup-emmet-jsx ()
+    "Set up Emmet for JSX/React."
+    (setq emmet-expand-jsx-className? t)  ;; Enable className expansion
+    (setq emmet-self-closing-tag-style "")) ;; JSX doesn't use trailing slash
+  
+  (add-hook 'js-mode-hook 'ek/setup-emmet-jsx)
+  (add-hook 'js-ts-mode-hook 'ek/setup-emmet-jsx)
+  (add-hook 'tsx-ts-mode-hook 'ek/setup-emmet-jsx))
 
 (provide 'init)
 ;;; init.el ends here
